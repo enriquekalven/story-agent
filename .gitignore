@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+env/
+venv/
+.env
+.env.*
+.pytest_cache/
+.coverage
+htmlcov/
+
+# IDE and System Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+.vscode/
+.idea/
+.project
+.pydevproject
+
+# Credentials and Local Configs
+.netrc
+.npmrc
+tokens.json
+credentials.json
+client_secrets.json
+example_evaluation.json
+scores.json
+.evolve/
+dashboard.md
+*.log
