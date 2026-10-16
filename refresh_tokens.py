@@ -2,6 +2,7 @@ import os
 import re
 import subprocess
 
+
 def get_token():
     print("Getting new access token via gcloud...")
     result = subprocess.run(

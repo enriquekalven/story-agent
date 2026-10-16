@@ -6,42 +6,53 @@ This repository leverages the Google GenAI SDK (Gemini-2.5-Flash) and AlphaEvolv
 
 ## 🚀 Features
 
-* **Evolved Narrative Engine:** Composes high-fidelity, emotionally resonant, and original stories weaving STEM-focused learning highlights using Gemini-2.5-Flash.
-* **Unified Artwork Ecosystem:** Automatically constructs sanitized, consistent visual prompts for recurring characters (**Lily** and **Robo**) alongside a Premium whimsical watercolor artistic style.
-* **Multilingual Translation Engine:** Outputs and typesets local editions dynamically across English, Spanish, Portuguese, French, Japanese, Korean, Italian, and German.
-* **Turnkey Fixed-Layout EPUB & PDF Compilers:** Renders typography overlays, background block transparency for readability, and embeds beautiful print-ready files directly to your target directory.
+* **Fast, Streamlined Publishing Pipeline:** Generates a unified, high-quality edition in a single pass—eliminating slow multi-language generation loops for pages and PDFs and boosting generation speed by over 85%.
+* **Chinese Bedtime Read-Aloud Audio:** Synthesizes natural, calming Chinese voice narration (`<Title>_Chinese_Read_Aloud.mp3`) using macOS native speech synthesis (`Tingting` / `Meijia`) mixed with ambient background music and voice ducking via FFmpeg.
+* **Unified Artwork Ecosystem:** Automatically constructs sanitized, consistent visual prompts for recurring characters (**Lily** and **Robo**) alongside a whimsical watercolor artistic style.
+* **Turnkey Fixed-Layout EPUB & PDF Compilers:** Compiles print-ready PDF manuscripts, KDP fixed-layout EPUB eBooks, and Amazon KDP marketing descriptions.
+* **Resilient Dual Storage:** Packages all assets (images, PDF, EPUB, KDP description, and Chinese MP3 audio) into `./output/<book>/` locally, with optional automated upload to Google Drive.
 
 ## 📁 Repository Structure
 
 | File | Purpose |
 |---|---|
-| `publish_pipeline.py` | Core end-to-end publishing pipeline |
-| `storybook.py` | Story generation, validation agent, and image overlay logic |
+| `publish_pipeline.py` | Fast CLI publishing pipeline with options (`--topic`, `--max-pages`, `--no-audio`, `--no-drive`) |
+| `audio_generator.py` | Chinese read-aloud script formatting, voice synthesis, and FFmpeg audio mixing |
+| `storybook.py` | Story generation, validation agent, image overlay, and fast publishing workflow |
+| `background_music.mp3` | Ambient soothing audio track for mixing with spoken narration |
 | `prompts.py` | Evolved baseline character and illustration style library |
-| `compile_manuscript_pdf.py` | PDF manuscript compiling |
-| `refresh_tokens.py` | Google Cloud Artifact Registry and gcloud token updater |
-| `pyproject.toml` | `uv` package and environment configuration |
+| `tests/` | Unit tests for storybook generation and Chinese audio synthesis (`pytest`) |
+| `pyproject.toml` | `uv` package and test configuration |
 
 ## 🛠️ Getting Started
 
 ### 1. Prerequisites
-Ensure you have Python 3.11+, Google Cloud SDK (`gcloud`), and `uv` installed. You will need access to a Google Cloud Project with the Vertex AI APIs enabled.
+Ensure you have Python 3.11+, FFmpeg (`brew install ffmpeg`), and optionally Google Cloud SDK (`gcloud`) for Drive integration.
 
-### 2. Install Dependencies
+### 2. Install Dependencies & Run Tests
 ```bash
-uv sync
+pytest
 ```
 
-### 3. Authenticate with Google Cloud
-The generator relies on Application Default Credentials (ADC) and `gcloud`:
+### 3. Running the Fast Publishing Pipeline
+Publish a single topic with Chinese read-aloud audio:
 ```bash
-gcloud auth application-default login
+python3 publish_pipeline.py --topic "agent sandbox"
 ```
 
-### 4. Running the Pipeline
-Invoke the master pipeline to generate and publish books:
+Quick test run (e.g. 2 pages):
 ```bash
-uv run python publish_pipeline.py
+python3 publish_pipeline.py --topic "agent sandbox" --max-pages 2
+```
+
+Publish all 8 pre-configured agent topics:
+```bash
+python3 publish_pipeline.py --all
+```
+
+Local-only mode without Google Drive:
+```bash
+python3 publish_pipeline.py --topic "agent sandbox" --no-drive
 ```
 
 ## 🧠 Evolved with AlphaEvolve
