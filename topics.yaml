@@ -1,0 +1,44 @@
+series: "Curious Little Minds™: Lily & Robo Adventures"
+author: "Enrique Chan"
+default_age_group: "4-6"
+topics:
+  - id: long-running-agents
+    topic_name: "long running agents (agents that work day and night to help people)"
+    folder_name: "Long Running Agents"
+    age_group: "4-6"
+    status: published
+  - id: agent-sandbox
+    topic_name: "agent sandbox (a safe digital playground where robots learn to play)"
+    folder_name: "Agent Sandbox"
+    age_group: "4-6"
+    status: pending
+  - id: memory-bank
+    topic_name: "memory bank (a magical treasure chest where robots keep their favorite memories and facts)"
+    folder_name: "Agent Memory Bank"
+    age_group: "4-6"
+    status: pending
+  - id: skills
+    topic_name: "skills (superpowers that AI agents learn, like drawing and translating languages)"
+    folder_name: "Agent Skills"
+    age_group: "4-6"
+    status: pending
+  - id: computer-use
+    topic_name: "computer use (how AI agents learn to click, type, and navigate a computer to help people with tasks)"
+    folder_name: "Agent Computer Use"
+    age_group: "4-6"
+    status: pending
+  - id: observability
+    topic_name: "observability (how AI agents keep track of their actions, like writing logs or keeping diary notes so people can see what they did)"
+    folder_name: "Agent Observability"
+    age_group: "4-6"
+    status: pending
+  - id: evaluation
+    topic_name: "evaluation (how AI agents are tested and checked to see how well they do their jobs, like a report card for robots)"
+    folder_name: "Agent Evaluation"
+    age_group: "4-6"
+    status: pending
+  - id: vibe-coding
+    topic_name: "vibe coding (how people can build apps and games simply by talking to computer helpers, using their ideas and vibes instead of writing complicated code)"
+    folder_name: "Agent Vibe Coding"
+    age_group: "4-6"
+    status: pending

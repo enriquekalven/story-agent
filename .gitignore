@@ -7,9 +7,15 @@ env/
 venv/
 .env
 .env.*
+!.env.example
 .pytest_cache/
+.ruff_cache/
 .coverage
 htmlcov/
+
+# Generated Storybook Output & Temp Audio
+output/
+*.aiff
 
 # IDE and System Files
 .DS_Store

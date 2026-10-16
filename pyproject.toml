@@ -1,9 +1,9 @@
 [project]
 name = "story-agent"
-version = "0.1.0"
-description = "Add your description here"
+version = "0.2.0"
+description = "Autonomous AI children's picture book and bilingual audio publishing pipeline (Curious Little Minds: Lily & Robo Adventures)"
 readme = "README.md"
-requires-python = ">=3.12.9"
+requires-python = ">=3.11"
 dependencies = [
     "google-genai",
     "google-adk",
@@ -11,12 +11,26 @@ dependencies = [
     "google-api-python-client",
     "google-auth-httplib2",
     "google-auth-oauthlib",
-    "pytest"
+    "pydantic",
+    "pyyaml",
+    "python-dotenv",
+    "pytest",
+]
+
+[dependency-groups]
+dev = [
+    "pytest",
+    "ruff",
 ]
 
 [tool.pytest.ini_options]
-pythonpath = [
-  "."
-]
+pythonpath = ["."]
+testpaths = ["tests"]
 
+[tool.ruff]
+line-length = 110
+target-version = "py311"
 
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+ignore = ["E501"]

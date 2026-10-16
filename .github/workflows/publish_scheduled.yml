@@ -1,0 +1,81 @@
+name: Scheduled Book Publisher
+
+on:
+  schedule:
+    # Runs every Monday at 09:00 UTC to publish the next pending book in topics.yaml
+    - cron: "0 9 * * 1"
+  workflow_dispatch:
+    inputs:
+      topic:
+        description: "Specific topic to publish (leave blank to publish next pending topic from topics.yaml)"
+        required: false
+        default: ""
+      max_pages:
+        description: "Optional page limit (e.g., 2 for smoke test; blank for full 20-page book)"
+        required: false
+        default: ""
+      no_drive:
+        description: "Skip Google Drive upload (true/false)"
+        required: false
+        default: "false"
+
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  publish-book:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install system dependencies (FFmpeg + Noto CJK fonts + epubcheck)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends ffmpeg fonts-noto-cjk epubcheck
+
+      - name: Authenticate to Google Cloud via Workload Identity Federation
+        if: env.GCP_WORKLOAD_IDENTITY_PROVIDER != ''
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+      - name: Install uv & Python dependencies
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Sync environment
+        run: uv sync --frozen
+
+      - name: Run publishing pipeline
+        env:
+          GOOGLE_CLOUD_PROJECT: ${{ secrets.GOOGLE_CLOUD_PROJECT || 'project-maui' }}
+          GOOGLE_CLOUD_LOCATION: us-central1
+          STORY_AGENT_TTS_PROVIDER: gemini
+          STORY_AGENT_VISUAL_QA: "true"
+        run: |
+          ARGS=("--workers" "4" "--qa")
+          if [ -n "${{ inputs.topic }}" ]; then
+            ARGS+=("--topic" "${{ inputs.topic }}")
+          else
+            ARGS+=("--next")
+          fi
+          if [ -n "${{ inputs.max_pages }}" ]; then
+            ARGS+=("--max-pages" "${{ inputs.max_pages }}")
+          fi
+          if [ "${{ inputs.no_drive }}" = "true" ]; then
+            ARGS+=("--no-drive")
+          fi
+          uv run python publish_pipeline.py "${ARGS[@]}"
+
+      - name: Upload generated book artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: published-storybook-${{ github.run_id }}
+          path: output/
+          if-no-files-found: warn
