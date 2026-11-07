@@ -27,6 +27,8 @@ jobs:
   publish-book:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    env:
+      GCP_WIF_PROVIDER: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -37,7 +39,7 @@ jobs:
           sudo apt-get install -y --no-install-recommends ffmpeg fonts-noto-cjk epubcheck
 
       - name: Authenticate to Google Cloud via Workload Identity Federation
-        if: env.GCP_WORKLOAD_IDENTITY_PROVIDER != ''
+        if: env.GCP_WIF_PROVIDER != ''
         uses: google-github-actions/auth@v2
         with:
           workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
@@ -53,21 +55,28 @@ jobs:
 
       - name: Run publishing pipeline
         env:
-          GOOGLE_CLOUD_PROJECT: ${{ secrets.GOOGLE_CLOUD_PROJECT || 'project-maui' }}
+          GOOGLE_CLOUD_PROJECT: ${{ secrets.GOOGLE_CLOUD_PROJECT }}
           GOOGLE_CLOUD_LOCATION: us-central1
           STORY_AGENT_TTS_PROVIDER: gemini
           STORY_AGENT_VISUAL_QA: "true"
+          INPUT_TOPIC: ${{ inputs.topic }}
+          INPUT_MAX_PAGES: ${{ inputs.max_pages }}
+          INPUT_NO_DRIVE: ${{ inputs.no_drive }}
         run: |
           ARGS=("--workers" "4" "--qa")
-          if [ -n "${{ inputs.topic }}" ]; then
-            ARGS+=("--topic" "${{ inputs.topic }}")
+          if [ -n "$INPUT_TOPIC" ]; then
+            ARGS+=("--topic" "$INPUT_TOPIC")
           else
             ARGS+=("--next")
           fi
-          if [ -n "${{ inputs.max_pages }}" ]; then
-            ARGS+=("--max-pages" "${{ inputs.max_pages }}")
+          if [ -n "$INPUT_MAX_PAGES" ]; then
+            if ! [[ "$INPUT_MAX_PAGES" =~ ^[0-9]+$ ]]; then
+              echo "Invalid max_pages input: must be a positive integer" >&2
+              exit 1
+            fi
+            ARGS+=("--max-pages" "$INPUT_MAX_PAGES")
           fi
-          if [ "${{ inputs.no_drive }}" = "true" ]; then
+          if [ "$INPUT_NO_DRIVE" = "true" ]; then
             ARGS+=("--no-drive")
           fi
           uv run python publish_pipeline.py "${ARGS[@]}"
