@@ -176,6 +176,7 @@ class ClipReplaceSafetyTests(unittest.TestCase):
             os.makedirs(os.path.join(tmp, "google_vids"))
             json.dump({"pages": [{"page_number": 1}]}, open(os.path.join(tmp, "story.json"), "w"))
             with mock.patch.object(vbp, "ensure_tab", return_value=True), \
+                    mock.patch.object(vza, "ensure_base_avatar_mp4", return_value=os.path.join(tmp, "base.mp4")), \
                     mock.patch.object(vza.vbf, "navigate_to_scene", return_value="TAB_NOT_FOUND"), \
                     mock.patch.object(vza.vcf, "replace_scene_avatar_video") as upload, \
                     mock.patch.object(vza.time, "sleep"):
