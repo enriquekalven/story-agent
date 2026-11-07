@@ -39,3 +39,10 @@ scores.json
 .evolve/
 dashboard.md
 *.log
+
+# Local KDP workspace: account scrapes/screenshots, KDP title IDs, generated covers, listings & EPUBs
+kdp/
+
+# Local-only assets: cached Google Vids avatar renders and Book 1 page art
+assets/classic_avatars/
+assets/book1_canonical/
