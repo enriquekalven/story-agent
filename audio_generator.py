@@ -6,24 +6,31 @@ synthesis (Tingting / Meijia) as a local engine, and mixes with gentle ambient
 background music using FFmpeg.
 """
 
+import base64
+import json
 import logging
 import os
 import re
 import shutil
 import subprocess
 import tempfile
+import urllib.request
 import wave
 from typing import Any, Dict, Optional
 
 from google.genai import Client, types
 
 import config
+import prompts
 
 logger = logging.getLogger(__name__)
 
-# Default voices for Chinese narration
+# Default voices for multilingual narration
 DEFAULT_CHINESE_VOICE = "Tingting"  # macOS zh_CN natural voice
 ALTERNATIVE_CHINESE_VOICE = "Meijia"  # macOS zh_TW natural voice
+DEFAULT_SPANISH_VOICE = "Paulina"  # macOS es_MX natural voice
+ALTERNATIVE_SPANISH_VOICE = "Mónica"  # macOS es_ES natural voice
+DEFAULT_ENGLISH_VOICE = "Samantha"  # macOS en_US natural voice
 DEFAULT_GEMINI_VOICE = config.GEMINI_TTS_VOICE
 
 
@@ -39,6 +46,64 @@ def clean_script_for_cloud_tts(script: str) -> str:
     return cleaned.strip()
 
 
+CLOUD_TTS_ENDPOINT = "https://texttospeech.googleapis.com/v1/text:synthesize"
+CANTONESE_VOICE = "yue-HK-Chirp3-HD-Aoede"  # same "Aoede" persona as the Mandarin Gemini TTS narration
+
+
+def synthesize_speech_cloud_tts(
+    text: str,
+    output_audio_path: str,
+    language_code: str = "yue-HK",
+    voice_name: str = CANTONESE_VOICE,
+    sample_rate_hz: int = 24000,
+) -> bool:
+    """Synthesizes narration with a Cloud Text-to-Speech voice pinned to an explicit locale (e.g. Cantonese).
+
+    Gemini TTS infers the language from the text, which can't be relied on to keep Cantonese apart from Mandarin;
+    Cloud TTS takes the locale explicitly. Writes a 16-bit mono WAV (LINEAR16 responses include the RIFF header).
+    """
+    try:
+        try:
+            import google.auth
+            import google.auth.transport.requests
+
+            creds, _ = google.auth.default(scopes=["https://www.googleapis.com/auth/cloud-platform"])
+            creds.refresh(google.auth.transport.requests.Request())
+            token = creds.token
+        except Exception:
+            token = subprocess.check_output(
+                ["gcloud", "auth", "print-access-token"], text=True, timeout=10
+            ).strip()
+        body = json.dumps({
+            "input": {"text": clean_script_for_cloud_tts(text)},
+            "voice": {"languageCode": language_code, "name": voice_name},
+            "audioConfig": {"audioEncoding": "LINEAR16", "sampleRateHertz": sample_rate_hz},
+        }).encode("utf-8")
+        req = urllib.request.Request(
+            CLOUD_TTS_ENDPOINT,
+            data=body,
+            method="POST",
+            headers={
+                "Authorization": f"Bearer {token}",
+                "x-goog-user-project": config.GOOGLE_CLOUD_PROJECT,
+                "Content-Type": "application/json; charset=utf-8",
+            },
+        )
+        with urllib.request.urlopen(req, timeout=120) as resp:
+            audio = base64.b64decode(json.load(resp)["audioContent"])
+        with open(output_audio_path, "wb") as f:
+            f.write(audio)
+        return os.path.getsize(output_audio_path) > 1000
+    except Exception as e:
+        logger.error(f"Cloud TTS synthesis failed ({voice_name}): {e}")
+        return False
+
+
+def _is_heritage_story(story_json: Dict[str, Any]) -> bool:
+    """True for Chinese Heritage & Proverbs books (Mei, Ming & Baobao) so narration branding matches the cast."""
+    return story_json.get("genre") == "chinese_heritage" or "Proverb Tales" in str(story_json.get("series", ""))
+
+
 def build_chinese_narration_script(story_json: Dict[str, Any]) -> str:
     """Extracts and structures a cohesive Chinese read-aloud bedtime script from story JSON.
 
@@ -51,7 +116,7 @@ def build_chinese_narration_script(story_json: Dict[str, Any]) -> str:
     script_parts = []
 
     # 1. Opening Sonic Branding
-    series_title = "好奇小脑瓜·莉莉与乐乐大冒险"
+    series_title = prompts.HERITAGE_SERIES_NAME_ZH if _is_heritage_story(story_json) else prompts.SERIES_NAME_ZH
     script_parts.append(f"欢迎收听《{series_title}》睡前故事。")
     script_parts.append(f"今天我们要听的故事是：《{title}》。")
     script_parts.append(f"著者：{author}。")
@@ -110,12 +175,100 @@ def build_chinese_narration_script(story_json: Dict[str, Any]) -> str:
             script_parts.append("[[slnc 600]]")  # 600ms page pause
 
     # 3. Comforting bedtime closing
+    closing_brand = series_title if _is_heritage_story(story_json) else "好奇小脑瓜"
     script_parts.append("[[slnc 500]]")
     script_parts.append(
-        f"《{title}》故事讲完了。这是《好奇小脑瓜》陪伴你的又一个奇妙夜晚。"
+        f"《{title}》故事讲完了。这是《{closing_brand}》陪伴你的又一个奇妙夜晚。"
         "谢谢你，聪明的小探险家！祝你做个甜美的好梦，晚安，明天见！"
     )
 
+    return "\n".join(script_parts)
+
+
+def build_spanish_narration_script(story_json: Dict[str, Any]) -> str:
+    """Extracts and structures a cohesive Spanish read-aloud bedtime script from story JSON."""
+    title = story_json.get("title_es") or story_json.get("title", "Cuento Infantil")
+    author = "Enrique Chan"
+    pages = story_json.get("pages", [])
+
+    heritage = _is_heritage_story(story_json)
+    script_parts = [
+        (
+            "Bienvenidos a Mentes Curiosas: Los Cuentos de Proverbios Chinos de Mei, Ming y Baobao."
+            if heritage
+            else "Bienvenidos a Mentes Curiosas: Las Aventuras de Lily y Robo."
+        ),
+        f"El cuento de hoy es: {title}, escrito por {author}.",
+        "[[slnc 800]]",
+    ]
+    for page in pages:
+        p_num = page.get("page_number", 1)
+        raw_text = (page.get("text_es") or page.get("text", "")).replace("*", "").strip()
+        if p_num == 1:
+            continue
+        if p_num == 2 and (
+            "curious little minds publishing" in raw_text.lower()
+            or "copyright" in raw_text.lower()
+            or "all rights reserved" in raw_text.lower()
+            or "todos los derechos reservados" in raw_text.lower()
+        ):
+            continue
+        if p_num == len(pages) and raw_text.lower() in ("the end", "el fin", "fin", "fim", "终"):
+            continue
+        clean_text = " ".join(line.strip() for line in raw_text.splitlines() if line.strip())
+        if clean_text:
+            script_parts.append(clean_text)
+            script_parts.append("[[slnc 600]]")
+
+    script_parts.append("[[slnc 500]]")
+    farewell = (
+        "¡Gracias por explorar con Mei, Ming y Baobao! ¡Dulces sueños y hasta el próximo cuento!"
+        if heritage
+        else "¡Gracias por explorar con Lily y Robo! ¡Dulces sueños y hasta la próxima aventura!"
+    )
+    script_parts.append(f"Y colorín colorado, el cuento {title} ha terminado. {farewell}")
+    return "\n".join(script_parts)
+
+
+def build_english_narration_script(story_json: Dict[str, Any]) -> str:
+    """Extracts and structures a cohesive English read-aloud bedtime script from story JSON."""
+    title = story_json.get("title", "Curious Little Minds Story")
+    author = "Enrique Chan"
+    pages = story_json.get("pages", [])
+
+    heritage = _is_heritage_story(story_json)
+    script_parts = [
+        (
+            "Welcome to Curious Little Minds: Mei, Ming and Baobao's Chinese Proverb Tales."
+            if heritage
+            else "Welcome to Curious Little Minds: Lily and Robo Adventures."
+        ),
+        f"Tonight's story is {title}, written by {author}.",
+        "[[slnc 800]]",
+    ]
+    for page in pages:
+        p_num = page.get("page_number", 1)
+        raw_text = (page.get("text", "")).replace("*", "").strip()
+        if p_num == 1:
+            continue
+        if p_num == 2 and (
+            "curious little minds publishing" in raw_text.lower()
+            or "copyright" in raw_text.lower()
+            or "all rights reserved" in raw_text.lower()
+        ):
+            continue
+        if p_num == len(pages) and raw_text.lower() in ("the end", "el fin", "fin", "fim", "终"):
+            continue
+        clean_text = " ".join(line.strip() for line in raw_text.splitlines() if line.strip())
+        if clean_text:
+            script_parts.append(clean_text)
+            script_parts.append("[[slnc 600]]")
+
+    script_parts.append("[[slnc 500]]")
+    script_parts.append(
+        f"The End. Thank you for reading {title} with {'Mei, Ming, and Baobao' if heritage else 'Lily and Robo'}! "
+        "Sweet dreams, little explorer, and see you on our next adventure!"
+    )
     return "\n".join(script_parts)
 
 
@@ -158,40 +311,73 @@ def synthesize_speech_say(
         return False
 
 
+_CACHED_TTS_CLIENT: Optional[Client] = None
+
+
 def synthesize_speech_gemini_tts(
     text: str,
     output_audio_path: str,
     voice_name: str = DEFAULT_GEMINI_VOICE,
     client: Optional[Client] = None,
+    language: str = "Mandarin Chinese",
 ) -> bool:
-    """Synthesizes Chinese bedtime narration using Gemini TTS (cross-platform Linux/Cloud Run)."""
+    """Synthesizes bedtime narration using Gemini TTS (cross-platform Linux/Cloud Run)."""
+    global _CACHED_TTS_CLIENT
     try:
         clean_text = clean_script_for_cloud_tts(text)
-        tts_client = client or Client(
+        tts_client = client or _CACHED_TTS_CLIENT or Client(
             vertexai=True,
             project=config.GOOGLE_CLOUD_PROJECT,
             location=config.GOOGLE_CLOUD_LOCATION,
         )
         prompt = (
-            "Read the following Mandarin Chinese children's bedtime story in a warm, gentle, "
+            f"Read the following {language} children's bedtime story in a warm, gentle, "
             "soothing storyteller voice with natural pauses between sentences:\n\n"
             f"{clean_text}"
         )
         logger.info(
-            f"Synthesizing speech with Gemini TTS model '{config.TTS_MODEL}' (voice: '{voice_name}')..."
+            f"Synthesizing {language} speech with Gemini TTS model '{config.TTS_MODEL}' (voice: '{voice_name}')..."
         )
-        response = tts_client.models.generate_content(
-            model=config.TTS_MODEL,
-            contents=prompt,
-            config=types.GenerateContentConfig(
-                response_modalities=["AUDIO"],
-                speech_config=types.SpeechConfig(
-                    voice_config=types.VoiceConfig(
-                        prebuilt_voice_config=types.PrebuiltVoiceConfig(voice_name=voice_name)
-                    )
-                ),
+        gen_cfg = types.GenerateContentConfig(
+            response_modalities=["AUDIO"],
+            speech_config=types.SpeechConfig(
+                voice_config=types.VoiceConfig(
+                    prebuilt_voice_config=types.PrebuiltVoiceConfig(voice_name=voice_name)
+                )
             ),
         )
+        try:
+            response = tts_client.models.generate_content(
+                model=config.TTS_MODEL,
+                contents=prompt,
+                config=gen_cfg,
+            )
+            _CACHED_TTS_CLIENT = tts_client
+        except Exception as auth_err:
+            if "Reauthentication" in str(auth_err) or "RefreshError" in str(type(auth_err)):
+                from google.oauth2.credentials import Credentials as OAuthCredentials
+
+                tok_res = subprocess.run(
+                    ["gcloud", "auth", "print-access-token"],
+                    capture_output=True,
+                    text=True,
+                    check=True,
+                )
+                creds = OAuthCredentials(token=tok_res.stdout.strip())
+                tts_client = Client(
+                    vertexai=True,
+                    project=config.GOOGLE_CLOUD_PROJECT,
+                    location=config.GOOGLE_CLOUD_LOCATION,
+                    credentials=creds,
+                )
+                _CACHED_TTS_CLIENT = tts_client
+                response = tts_client.models.generate_content(
+                    model=config.TTS_MODEL,
+                    contents=prompt,
+                    config=gen_cfg,
+                )
+            else:
+                raise
 
         audio_bytes = None
         mime_type = ""
@@ -306,7 +492,75 @@ def generate_chinese_audio_file(
     """End-to-end generator that turns story JSON into a polished Chinese MP3 audio file."""
     script = build_chinese_narration_script(story_json)
     logger.info(f"Generated narration script ({len(script)} chars): {script[:80]}...")
+    return _synthesize_and_mix_script(
+        script=script,
+        output_mp3_path=output_mp3_path,
+        voice=voice,
+        rate_wpm=rate_wpm,
+        bgm_path=bgm_path,
+        bgm_volume=bgm_volume,
+        tts_provider=tts_provider,
+        language="Mandarin Chinese",
+    )
 
+
+def generate_spanish_audio_file(
+    story_json: Dict[str, Any],
+    output_mp3_path: str,
+    voice: str = DEFAULT_SPANISH_VOICE,
+    rate_wpm: int = 175,
+    bgm_path: Optional[str] = "background_music.mp3",
+    bgm_volume: float = 0.12,
+    tts_provider: Optional[str] = None,
+) -> str:
+    """End-to-end generator that turns story JSON into a polished Spanish MP3 audio file."""
+    script = build_spanish_narration_script(story_json)
+    return _synthesize_and_mix_script(
+        script=script,
+        output_mp3_path=output_mp3_path,
+        voice=voice,
+        rate_wpm=rate_wpm,
+        bgm_path=bgm_path,
+        bgm_volume=bgm_volume,
+        tts_provider=tts_provider,
+        language="Spanish",
+    )
+
+
+def generate_english_audio_file(
+    story_json: Dict[str, Any],
+    output_mp3_path: str,
+    voice: str = DEFAULT_ENGLISH_VOICE,
+    rate_wpm: int = 175,
+    bgm_path: Optional[str] = "background_music.mp3",
+    bgm_volume: float = 0.12,
+    tts_provider: Optional[str] = None,
+) -> str:
+    """End-to-end generator that turns story JSON into a polished English MP3 audio file."""
+    script = build_english_narration_script(story_json)
+    return _synthesize_and_mix_script(
+        script=script,
+        output_mp3_path=output_mp3_path,
+        voice=voice,
+        rate_wpm=rate_wpm,
+        bgm_path=bgm_path,
+        bgm_volume=bgm_volume,
+        tts_provider=tts_provider,
+        language="English",
+    )
+
+
+def _synthesize_and_mix_script(
+    script: str,
+    output_mp3_path: str,
+    voice: str,
+    rate_wpm: int = 175,
+    bgm_path: Optional[str] = "background_music.mp3",
+    bgm_volume: float = 0.12,
+    tts_provider: Optional[str] = None,
+    language: str = "Mandarin Chinese",
+) -> str:
+    """Shared synthesis + FFmpeg background music mixing pipeline for any language script."""
     provider = (tts_provider or config.TTS_PROVIDER or "auto").lower()
     is_mocked_say = hasattr(synthesize_speech_say, "_mock_name") or "MagicMock" in type(synthesize_speech_say).__name__
 
@@ -318,15 +572,17 @@ def generate_chinese_audio_file(
         success = False
         if provider == "gemini" and not is_mocked_say:
             gemini_voice = voice if voice in ("Kore", "Aoede", "Puck", "Charon", "Fenrir") else DEFAULT_GEMINI_VOICE
-            success = synthesize_speech_gemini_tts(script, temp_audio_path, voice_name=gemini_voice)
+            success = synthesize_speech_gemini_tts(
+                script, temp_audio_path, voice_name=gemini_voice, language=language
+            )
         elif provider == "say" or is_mocked_say or shutil.which("say") is not None:
             success = synthesize_speech_say(script, temp_audio_path, voice=voice, rate_wpm=rate_wpm)
             if not success and not is_mocked_say and provider == "auto":
                 logger.info("macOS 'say' failed; falling back to Gemini TTS...")
-                success = synthesize_speech_gemini_tts(script, temp_audio_path)
+                success = synthesize_speech_gemini_tts(script, temp_audio_path, language=language)
         else:
             logger.info("macOS 'say' not available on this OS; using Gemini TTS for headless synthesis...")
-            success = synthesize_speech_gemini_tts(script, temp_audio_path)
+            success = synthesize_speech_gemini_tts(script, temp_audio_path, language=language)
 
         if not success:
             raise RuntimeError("Speech synthesis failed across configured TTS providers.")
@@ -339,16 +595,16 @@ def generate_chinese_audio_file(
             else:
                 actual_bgm = None
 
-        result_path = mix_voice_and_bgm(
+        return mix_voice_and_bgm(
             voice_aiff_path=temp_audio_path,
             output_mp3_path=output_mp3_path,
             bgm_path=actual_bgm,
             bgm_volume=bgm_volume,
         )
-        return result_path
     finally:
         if os.path.exists(temp_audio_path):
             try:
                 os.remove(temp_audio_path)
             except Exception:
                 pass
+

@@ -41,8 +41,11 @@ def run_pipeline(
     max_workers: int = config.MAX_CONCURRENT_PAGES,
     enable_visual_qa: bool = config.ENABLE_VISUAL_QA,
     upscale_pdf: bool = False,
+    export_vids: bool = True,
+    character_ids: Optional[List[str]] = None,
+    genre: Optional[str] = None,
 ) -> List[dict]:
-    """Executes the fast publishing pipeline for specified topics."""
+    """Executes the fast publishing pipeline for specified topics (STEM or Chinese Heritage genre)."""
     drive_service = init_drive_service(no_drive=no_drive)
     book_gen = StorybookGenerator(drive_service=drive_service)
 
@@ -56,21 +59,18 @@ def run_pipeline(
         topic = topic_cfg["topic_name"]
         folder_name = topic_cfg.get("folder_name", topic[:30])
         age_group = topic_cfg.get("age_group", "4-6")
+        topic_chars = character_ids or topic_cfg.get("characters")
+        topic_genre = genre or topic_cfg.get("genre")
+        heritage = prompts.is_heritage_genre(topic=topic, character_ids=topic_chars, genre=topic_genre)
+        if heritage:
+            topic_genre = "chinese_heritage"
 
         logger.info("=" * 60)
         logger.info(f"[{idx}/{len(topics)}] Publishing: '{topic}'")
         logger.info("=" * 60)
 
-        topic_folder_id = None
-        if drive_service and root_folder_id:
-            try:
-                topic_folder_id = book_gen.create_drive_folder(
-                    folder_name, parent_id=root_folder_id
-                )
-            except Exception as e:
-                logger.warning(f"Could not create Drive topic subfolder: {e}")
-
         topic_output_dir = os.path.join(output_base_dir, folder_name)
+        char_desc, _, _ = prompts.build_character_prompt_context(topic_chars, genre=topic_genre)
 
         try:
             res = book_gen.run_fast_publishing_workflow(
@@ -78,9 +78,9 @@ def run_pipeline(
                 age_group=age_group,
                 max_pages=max_pages,
                 language="English",
-                parent_id=topic_folder_id,
-                override_char=prompts.SERIES_CHARACTER,
-                override_style=prompts.SERIES_STYLE,
+                parent_id=root_folder_id,
+                override_char=char_desc,
+                override_style=prompts.HERITAGE_STYLE if heritage else prompts.SERIES_STYLE,
                 generate_audio=(not no_audio),
                 output_dir=topic_output_dir,
                 bgm_path=bgm_path,
@@ -89,6 +89,9 @@ def run_pipeline(
                 max_workers=max_workers,
                 enable_visual_qa=enable_visual_qa,
                 upscale_pdf=upscale_pdf,
+                export_vids=export_vids,
+                character_ids=topic_chars,
+                genre=topic_genre,
             )
             results.append(res)
             if res.get("status") == "success":
@@ -138,7 +141,10 @@ def run_pipeline(
 
 def parse_args(argv: Optional[List[str]] = None):
     parser = argparse.ArgumentParser(
-        description="Fast, automated publishing pipeline for Lily & Robo Adventures with Chinese Audio."
+        description=(
+            "Fast, automated publishing pipeline for Curious Little Minds (Lily & Robo STEM Adventures and "
+            "Mei, Ming & Baobao's Chinese Proverb Tales) with Chinese Audio & Google Vids."
+        )
     )
     parser.add_argument(
         "--topic",
@@ -213,12 +219,33 @@ def parse_args(argv: Optional[List[str]] = None):
         action="store_true",
         help="Upscale pages to 2550x2550 (8.5x8.5 inches at 300 DPI) when compiling the print PDF.",
     )
+    parser.add_argument(
+        "--vids",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Automatically export 16:9 Google Vids decks and EN/ES/ZH localized editions (default: --vids).",
+    )
+    parser.add_argument(
+        "--characters",
+        nargs="*",
+        default=None,
+        help="Character IDs from characters.yaml to include in the story (e.g. --characters lily robo mia).",
+    )
+    parser.add_argument(
+        "--genre",
+        choices=["stem", "chinese_heritage"],
+        default=None,
+        help="Series genre: filters --next/--all and forces the genre for --topic (stem | chinese_heritage).",
+    )
     return parser.parse_args(argv)
 
 
 def main(argv: Optional[List[str]] = None) -> int:
     args = parse_args(argv)
     all_topics = config.load_topics()
+    genre_topics = [
+        t for t in all_topics if not args.genre or str(t.get("genre", "stem")).lower() == args.genre
+    ]
 
     if args.topic:
         matched = [
@@ -239,16 +266,16 @@ def main(argv: Optional[List[str]] = None) -> int:
                 }
             ]
     elif args.next:
-        next_topic = config.get_next_pending_topic()
+        next_topic = config.get_next_pending_topic(genre=args.genre)
         if not next_topic:
             logger.info("All topics in topics.yaml are already marked 'published'! Nothing to do.")
             return 0
         topics = [next_topic]
         logger.info("Selected next pending topic from topics.yaml: '%s'", next_topic["topic_name"])
     elif args.all:
-        topics = all_topics
+        topics = genre_topics
     else:
-        topics = [all_topics[0]]
+        topics = [(genre_topics or all_topics)[0]]
         logger.info(
             "No --topic, --next, or --all specified; defaulting to topic: '%s'",
             topics[0]["topic_name"],
@@ -266,6 +293,9 @@ def main(argv: Optional[List[str]] = None) -> int:
         max_workers=args.workers,
         enable_visual_qa=args.qa,
         upscale_pdf=args.upscale_pdf,
+        export_vids=args.vids,
+        character_ids=args.characters,
+        genre=args.genre,
     )
 
     logger.info("=" * 60)
@@ -287,6 +317,9 @@ def main(argv: Optional[List[str]] = None) -> int:
             logger.info(f"  EPUB: {r.get('epub_path')}")
         if r.get("audio_path"):
             logger.info(f"  Chinese Audio: {r.get('audio_path')}")
+        if r.get("google_vids") and isinstance(r.get("google_vids"), dict):
+            decks = r["google_vids"].get("decks", {})
+            logger.info(f"  Google Vids 16:9 Decks: {list(decks.keys())}")
         if r.get("manifest_path"):
             logger.info(f"  Manifest: {r.get('manifest_path')}")
         if r.get("drive_folder_id"):
