@@ -6,7 +6,6 @@ readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
     "google-genai",
-    "google-adk",
     "Pillow",
     "google-api-python-client",
     "google-auth-httplib2",
@@ -14,7 +13,7 @@ dependencies = [
     "pydantic",
     "pyyaml",
     "python-dotenv",
-    "pytest",
+    "websockets",
 ]
 
 [dependency-groups]
@@ -22,6 +21,13 @@ dev = [
     "pytest",
     "ruff",
 ]
+
+# Always resolve from public PyPI, even on machines whose uv config points at a private
+# mirror, so uv.lock stays installable by GitHub Actions, Cloud Build and Docker.
+[[tool.uv.index]]
+name = "pypi"
+url = "https://pypi.org/simple"
+default = true
 
 [tool.pytest.ini_options]
 pythonpath = ["."]
