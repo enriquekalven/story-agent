@@ -259,5 +259,35 @@ class TestStorybookGenerator(unittest.TestCase):
         self.assertIsInstance(cover_img, bytes)
         self.assertGreater(len(cover_img), 0)
 
+    def test_lily_backpack_strap_and_extra_hands_invariants(self):
+        import json
+
+        import prompts
+
+        self.assertIn("smooth, plain blue shoulder straps", prompts.SERIES_CHARACTER)
+        self.assertIn("EXACTLY TWO normal arms and TWO hands total", prompts.SERIES_CHARACTER)
+        self.assertIn("NEVER extra hands or disembodied hands on her backpack straps", prompts.CHARACTER_INVARIANTS)
+        self.assertIn("hands on backpack straps", prompts.NEGATIVE_STYLE_PROMPT)
+
+        mock_client = MagicMock()
+        mock_resp = MagicMock()
+        mock_resp.text = json.dumps({
+            "passed": True,
+            "lily_count": 1,
+            "robo_count": 1,
+            "has_unwanted_text": False,
+            "robo_off_model": False,
+            "lily_off_model": False,
+            "lily_extra_hands": True,
+            "score": 0.4,
+            "issues": [],
+        })
+        mock_client.models.generate_content.return_value = mock_resp
+        gen = StorybookGenerator(self.mock_drive, ai_client=mock_client)
+        qa = gen.evaluate_page_image_qa(b"fake_img", page_num=1, scene_description="Lily and Robo wave.")
+        self.assertFalse(qa["passed"])
+        self.assertTrue(any("backpack straps" in issue for issue in qa["issues"]))
+
+
 if __name__ == "__main__":
     unittest.main()

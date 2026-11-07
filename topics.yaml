@@ -1,44 +1,274 @@
-series: "Curious Little Minds™: Lily & Robo Adventures"
-author: "Enrique Chan"
-default_age_group: "4-6"
+series: 'Curious Little Minds™: Lily & Robo Adventures'
+author: Enrique Chan
+default_age_group: 4-6
 topics:
-  - id: long-running-agents
-    topic_name: "long running agents (agents that work day and night to help people)"
-    folder_name: "Long Running Agents"
-    age_group: "4-6"
-    status: published
-  - id: agent-sandbox
-    topic_name: "agent sandbox (a safe digital playground where robots learn to play)"
-    folder_name: "Agent Sandbox"
-    age_group: "4-6"
-    status: pending
-  - id: memory-bank
-    topic_name: "memory bank (a magical treasure chest where robots keep their favorite memories and facts)"
-    folder_name: "Agent Memory Bank"
-    age_group: "4-6"
-    status: pending
-  - id: skills
-    topic_name: "skills (superpowers that AI agents learn, like drawing and translating languages)"
-    folder_name: "Agent Skills"
-    age_group: "4-6"
-    status: pending
-  - id: computer-use
-    topic_name: "computer use (how AI agents learn to click, type, and navigate a computer to help people with tasks)"
-    folder_name: "Agent Computer Use"
-    age_group: "4-6"
-    status: pending
-  - id: observability
-    topic_name: "observability (how AI agents keep track of their actions, like writing logs or keeping diary notes so people can see what they did)"
-    folder_name: "Agent Observability"
-    age_group: "4-6"
-    status: pending
-  - id: evaluation
-    topic_name: "evaluation (how AI agents are tested and checked to see how well they do their jobs, like a report card for robots)"
-    folder_name: "Agent Evaluation"
-    age_group: "4-6"
-    status: pending
-  - id: vibe-coding
-    topic_name: "vibe coding (how people can build apps and games simply by talking to computer helpers, using their ideas and vibes instead of writing complicated code)"
-    folder_name: "Agent Vibe Coding"
-    age_group: "4-6"
-    status: pending
+- id: long-running-agents
+  topic_name: long running agents (agents that work day and night to help people)
+  folder_name: Long Running Agents
+  age_group: 4-6
+  status: published
+- id: agent-sandbox
+  topic_name: agent sandbox (a safe digital playground where robots learn to play)
+  folder_name: Agent Sandbox
+  age_group: 4-6
+  status: published
+  last_published_at: '2026-10-19T06:41:08.882829+00:00'
+- id: memory-bank
+  topic_name: memory bank (a magical treasure chest where robots keep their favorite
+    memories and facts)
+  folder_name: Agent Memory Bank
+  age_group: 4-6
+  status: published
+  last_published_at: '2026-10-19T06:44:06.721322+00:00'
+- id: skills
+  topic_name: skills (superpowers that AI agents learn, like drawing and translating
+    languages)
+  folder_name: Agent Skills
+  age_group: 4-6
+  status: published
+  last_published_at: '2026-10-19T06:47:34.646243+00:00'
+- id: computer-use
+  topic_name: computer use (how AI agents learn to click, type, and navigate a computer
+    to help people with tasks)
+  folder_name: Agent Computer Use
+  age_group: 4-6
+  status: published
+  last_published_at: '2026-10-26T22:29:55.542353+00:00'
+- id: observability
+  topic_name: observability (how AI agents keep track of their actions, like writing
+    logs or keeping diary notes so people can see what they did)
+  folder_name: Agent Observability
+  age_group: 4-6
+  status: published
+  last_published_at: '2026-10-26T22:33:33.670008+00:00'
+- id: evaluation
+  topic_name: evaluation (how AI agents are tested and checked to see how well they
+    do their jobs, like a report card for robots)
+  folder_name: Agent Evaluation
+  age_group: 4-6
+  status: published
+  last_published_at: '2026-10-26T22:30:20.542771+00:00'
+- id: vibe-coding
+  topic_name: vibe coding (how people can build apps and games simply by talking to
+    computer helpers, using their ideas and vibes instead of writing complicated code)
+  folder_name: Agent Vibe Coding
+  age_group: 4-6
+  status: published
+  last_published_at: '2026-10-19T06:50:35.512999+00:00'
+- id: year-of-the-horse
+  topic_name: Chinese New Year - Year of the Horse (how Lily and Robo celebrate the
+    Lunar New Year festival by guiding a glowing lantern-parade horse helper that
+    coordinates red lanterns, lion dancers, and festive wishes like a friendly multi-agent
+    team)
+  folder_name: Year of the Horse
+  age_group: 4-6
+  status: published
+  last_published_at: '2026-10-19T06:53:57.612660+00:00'
+- id: agent-to-agent
+  topic_name: multi-agent orchestration and agent-to-agent A2A communication (how
+    specialist AI agents team up, share tasks with glowing walkie-talkies, and coordinate
+    like a club of helpers where every robot does what it does best)
+  folder_name: Agent To Agent
+  age_group: 4-6
+  status: published
+  last_published_at: '2026-10-26T22:30:36.257534+00:00'
+- id: mcp-connectors
+  topic_name: Model Context Protocol and tool connectors (how AI agents use a universal
+    rainbow keyring to safely connect to libraries, art studios, maps, and external
+    tools)
+  folder_name: Agent MCP Connectors
+  age_group: 4-6
+  status: published
+  last_published_at: '2026-10-26T22:30:47.123184+00:00'
+- id: human-in-the-loop
+  topic_name: human-in-the-loop and safety guardrails (how AI agents pause before
+    big decisions and ask a trusted human for a green-light high-five approval before
+    stepping through)
+  folder_name: Agent Human In The Loop
+  age_group: 4-6
+  status: published
+  last_published_at: '2026-10-26T22:30:58.952817+00:00'
+- id: agent-grounding
+  topic_name: grounding and search (how AI agents look up real facts in trusted books
+    with a glowing magnifying glass instead of guessing or making things up)
+  folder_name: Agent Grounding
+  age_group: 4-6
+  status: published
+  last_published_at: '2026-10-26T22:31:11.288767+00:00'
+- id: agent-evolution
+  topic_name: self-improving agents and evolutionary optimization (how AI agents fold,
+    fly, test, and tweak paper airplanes across the meadow, learning from each flight
+    until the best design glides all the way to the hilltop)
+  folder_name: Agent Evolution
+  age_group: 4-6
+  status: published
+  last_published_at: '2026-10-26T22:31:21.219253+00:00'
+- id: iron-rod-into-needle
+  genre: chinese_heritage
+  characters:
+  - mei
+  - ming
+  - baobao
+  topic_name: Grinding an Iron Rod into a Needle (铁杵磨成针 / 鐵杵磨成針 — how Mei, Ming, and
+    their red-panda spirit guide Baobao discover the classic Chinese proverb about
+    patiently grinding a heavy iron pestle by a mountain stream into a fine sewing
+    needle through steady, joyful daily steps)
+  folder_name: Iron Rod Into A Needle
+  age_group: 4-6
+  status: published
+  last_published_at: '2026-10-24T21:32:05.033420+00:00'
+- id: kong-rong-shares-pears
+  genre: chinese_heritage
+  characters:
+  - mei
+  - ming
+  - baobao
+  topic_name: Kong Rong Shares the Biggest Pear (孔融让梨 / 孔融讓梨 — how Mei, Ming, and
+    their red-panda spirit guide Baobao harvest golden autumn pears in Grandma's sunlit
+    courtyard orchard and discover the classic Chinese proverb about choosing the
+    smallest pear for yourself so your family gets the sweetest ones)
+  folder_name: Kong Rong Shares The Pears
+  age_group: 4-6
+  status: published
+  last_published_at: '2026-10-24T21:35:44.646346+00:00'
+- id: sima-guang-water-vat
+  genre: chinese_heritage
+  characters:
+  - mei
+  - ming
+  - baobao
+  topic_name: Sima Guang Smashes the Water Vat (司马光砸缸 / 司馬光砸缸 — how Mei, Ming, and
+    their red-panda spirit guide Baobao learn the classic Chinese proverb about staying
+    calm and thinking creatively to rescue a friend trapped in a deep courtyard rainwater
+    vat)
+  folder_name: Sima Guang Smashes The Water Vat
+  age_group: 4-6
+  status: published
+  last_published_at: '2026-10-24T21:39:47.412133+00:00'
+- id: frog-in-the-well
+  genre: chinese_heritage
+  characters:
+  - mei
+  - ming
+  - baobao
+  topic_name: The Little Frog at the Bottom of the Well (井底之蛙 / 井底之蛙 — how Mei, Ming,
+    and their red-panda spirit guide Baobao befriend a cheerful green frog in a mossy
+    courtyard well and help him hop up to behold the vast starry lotus valley, misty
+    mountains, and endless sky)
+  folder_name: The Frog In The Well
+  age_group: 4-6
+  status: published
+  last_published_at: '2026-10-24T21:43:05.997928+00:00'
+- id: painting-the-dragons-eyes
+  genre: chinese_heritage
+  characters:
+  - mei
+  - ming
+  - baobao
+  topic_name: Painting the Dragon's Eyes (画龙点睛 / 畫龍點睛 — how Mei, Ming, and their red-panda
+    spirit guide Baobao learn the classic Chinese proverb about Master Zhang Sengyou
+    bringing a painted mural dragon to life with two careful, focused brushstrokes
+    on its eyes)
+  folder_name: Painting The Dragons Eyes
+  age_group: 4-6
+  status: published
+  last_published_at: '2026-10-24T21:46:37.708168+00:00'
+- id: waiting-by-the-tree-stump
+  genre: chinese_heritage
+  characters:
+  - mei
+  - ming
+  - baobao
+  topic_name: Waiting by the Tree Stump for a Rabbit (守株待兔 / 守株待兔 — how Mei, Ming,
+    and their red-panda spirit guide Baobao meet a sleepy bunny by an old camphor
+    tree stump and learn the classic Chinese proverb that joyful effort and planting
+    seeds grow wonderful things much better than waiting around for lucky accidents)
+  folder_name: Waiting By The Tree Stump
+  age_group: 4-6
+  status: published
+  last_published_at: '2026-10-24T21:49:33.223385+00:00'
+- id: pulling-up-sprouts
+  genre: chinese_heritage
+  characters:
+  - mei
+  - ming
+  - baobao
+  topic_name: Pulling Up Sprouts to Help Them Grow (拔苗助长 / 拔苗助長 — how Mei, Ming, and
+    their red-panda spirit guide Baobao tend a sunny bamboo terrace garden and learn
+    the classic Chinese proverb that tender sprouts and little children grow best
+    with gentle patience, water, and sunshine rather than rushing)
+  folder_name: Pulling Up Sprouts
+  age_group: 4-6
+  status: published
+  last_published_at: '2026-10-24T21:53:08.568698+00:00'
+- id: old-man-moved-mountains
+  genre: chinese_heritage
+  characters:
+  - mei
+  - ming
+  - baobao
+  topic_name: The Old Man Who Moved Mountains (愚公移山 / 愚公移山 — how Mei, Ming, and their
+    red-panda spirit guide Baobao team up with Grandpa to carry little woven baskets
+    of pebbles and clear a blocked mountain garden path, living the classic Chinese
+    proverb about family teamwork and determination)
+  folder_name: The Old Man Who Moved Mountains
+  age_group: 4-6
+  status: published
+  last_published_at: '2026-10-24T21:55:51.821772+00:00'
+- id: adding-feet-to-a-snake
+  genre: chinese_heritage
+  characters:
+  - mei
+  - ming
+  - baobao
+  topic_name: Adding Feet to a Drawing of a Snake (画蛇添足 / 畫蛇添足 — how Mei, Ming, and
+    their red-panda spirit guide Baobao giggle during a festive lantern-painting afternoon
+    and learn the classic Chinese proverb about the joyful wisdom of knowing when
+    a creation is already complete and just right)
+  folder_name: Adding Feet To A Snake
+  age_group: 4-6
+  status: published
+  last_published_at: '2026-10-24T21:59:31.817780+00:00'
+- id: touching-the-elephant
+  genre: chinese_heritage
+  characters:
+  - mei
+  - ming
+  - baobao
+  topic_name: Touching Different Parts of the Elephant (盲人摸象 / 盲人摸象 — how Mei, Ming,
+    and their red-panda spirit guide Baobao play a lantern-lit courtyard guessing
+    game with a gentle festival elephant and learn the classic Chinese proverb that
+    listening to every friend's perspective reveals the whole big picture)
+  folder_name: Touching The Elephant
+  age_group: 4-6
+  status: published
+  last_published_at: '2026-10-24T22:02:52.526204+00:00'
+- id: mending-the-sheepfold
+  genre: chinese_heritage
+  characters:
+  - mei
+  - ming
+  - baobao
+  topic_name: Mending the Sheepfold After a Sheep Wanders Off (亡羊补牢 / 亡羊補牢 — how Mei,
+    Ming, and their red-panda spirit guide Baobao find a fluffy little lamb that slipped
+    through a loose bamboo gate and weave the fence strong and snug together, learning
+    the classic Chinese proverb that it is never too late to fix a mistake)
+  folder_name: Mending The Sheepfold
+  age_group: 4-6
+  status: published
+  last_published_at: '2026-10-24T22:06:01.286081+00:00'
+- id: fox-and-the-tiger
+  genre: chinese_heritage
+  characters:
+  - mei
+  - ming
+  - baobao
+  topic_name: The Clever Fox Walking Behind the Tiger (狐假虎威 / 狐假虎威 — how Mei, Ming,
+    and their red-panda spirit guide Baobao meet a boastful little red fox and a gentle
+    guardian tiger in a misty bamboo forest and learn the classic Chinese proverb
+    that true confidence comes from your own kind heart rather than borrowing someone
+    else's shadow)
+  folder_name: The Fox And The Tiger
+  age_group: 4-6
+  status: published
+  last_published_at: '2026-10-24T22:10:19.145646+00:00'

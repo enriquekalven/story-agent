@@ -1,0 +1,204 @@
+# ==============================================================================
+# Curious Little Minds™: Lily & Robo Adventures — Canonical Character Registry
+# ==============================================================================
+# Grounded in Book 1 ("The Night-Light Helpers" / Long Running Agents) visual
+# ground truth. Every character entry specifies:
+#   - id: Unique slug used in topics.yaml or CLI (--characters)
+#   - name / name_es / name_zh: Localized character names
+#   - role: protagonist | companion | recurring_friend | family | helper
+#   - default_active: True for core cast (Lily & Robo), False for guest characters
+#   - reference_image: Path to canonical visual turnaround/reference crop
+#   - visual_description: Detailed positive visual specification
+#   - strict_invariants: Non-negotiable visual rules enforced in prompts & Vision QA
+#   - negative_traits: Off-model traits that must never appear
+# ==============================================================================
+
+master_reference_sheet: "assets/character_reference_sheet.png"
+require_reference_sheet: true
+
+characters:
+  - id: "lily"
+    name: "Lily"
+    name_es: "Lily"
+    name_zh: "莉莉"
+    role: "protagonist"
+    default_active: true
+    reference_image: "assets/characters/lily_book1_ref.png"
+    visual_description: >-
+      Lily is a cheerful 6-year-old girl with fair skin, soft rosy watercolor cheeks with tiny
+      light freckles across her nose, expressive large warm-brown eyes with white catchlights,
+      and warm chestnut-brown wavy hair with soft bangs across her forehead, styled in two
+      high-side fluffy curly pigtail buns/puffs tied with bright red ribbon bows on the upper
+      sides of her head plus soft wavy shoulder-length curls framing her face and neck. She wears
+      a short puff-sleeved buttercup-yellow A-line dress with golden-mustard and white polka dots,
+      a crisp white rounded Peter Pan collar, three small buttons down the front bodice, a sky-blue
+      backpack with smooth, plain blue shoulder straps (NEVER hands on the straps), white ankle socks,
+      and bright red Mary Jane strap shoes. Lily has EXACTLY TWO normal arms and TWO hands total.
+    strict_invariants: >-
+      Lily MUST match Book 1 ("LILY & ROBO: DAY & NIGHT ADVENTURES"): 6-year-old girl with
+      warm chestnut-brown wavy hair styled in two high-side fluffy curly pigtail puffs tied with
+      bright red ribbon bows PLUS soft wavy shoulder-length curls framing her face and soft bangs,
+      large warm-brown eyes, rosy cheeks with tiny freckles, a short puff-sleeved buttercup-yellow
+      polka-dot A-line dress with a white Peter Pan collar and three small front bodice buttons,
+      a sky-blue backpack with smooth plain sky-blue shoulder straps, white ankle socks, and bright
+      red Mary Jane strap shoes (NEVER braided hair, NEVER a single ponytail, NEVER missing her yellow
+      polka-dot dress with white collar, NEVER extra hands or hands on her backpack straps — Lily has
+      EXACTLY TWO arms and TWO hands total).
+    negative_traits: >-
+      braided hair, braided pigtails, single ponytail, straight flat hair, missing red hair bows,
+      barefoot, missing white Peter Pan collar, wrong dress color, extra hands, four hands, three hands,
+      hands on backpack straps, disembodied hands on chest straps.
+
+  - id: "robo"
+    name: "Robo"
+    name_es: "Robo"
+    name_zh: "乐乐"
+    role: "companion"
+    default_active: true
+    reference_image: "assets/characters/robo_book1_ref.png"
+    visual_description: >-
+      Robo is a small, round spherical sky-blue / powder-blue metallic robot, about waist-high
+      to Lily, matching Book 1 ("LILY & ROBO: DAY & NIGHT ADVENTURES"): a single smooth round
+      sky-blue spherical body with a horizontal equator seam line across his middle, subtle rivet
+      dots along his side seams, and small circular buttons on his lower belly. His face is drawn
+      DIRECTLY on his smooth sky-blue spherical body (NO separate visor cutout, NO black screen,
+      NO white/cream faceplate) with two large expressive round cartoon eyes (white outer sclera
+      rings with large deep cobalt/navy-blue irises and white catchlights), two small curved
+      eyebrows above his eyes, soft rosy cheek blush ovals, and a simple happy curved U-shaped
+      line smile directly between/below his eyes. He has a single slender top antenna stalk rising
+      from a small dome base on the very top of his head tipped with a glowing orb ball, circular
+      ear-like side hubs, short segmented tubular blue arms with simple 2- or 3-fingered rounded
+      pincer hands, and two short segmented cylindrical blue legs ending in rounded dome feet.
+    strict_invariants: >-
+      Robo MUST match Book 1 ("LILY & ROBO: DAY & NIGHT ADVENTURES"): single round spherical
+      sky-blue metallic robot (waist-high to Lily) with a horizontal equator seam line, face
+      drawn DIRECTLY on his blue spherical metal body (NEVER a separate black monitor screen or
+      recessed visor cutout), two large round white-and-cobalt-blue cartoon eyes with small curved
+      eyebrows, a simple curved line smile, rosy blush cheeks, a single slender top antenna stalk
+      with a glowing ball tip on top of his head, circular side ear-hubs, short segmented tubular
+      blue arms with rounded pincer hands, and short segmented cylindrical blue legs with dome feet.
+      NO wheels, NO tank tracks, NO dark black face screen, NO boxy square torso.
+    negative_traits: >-
+      black face screen, dark monitor visor cutout, separate recessed faceplate, glowing neon dot
+      eyes on black screen, wheels, tank tracks, multiple side antennas, gears, boxy square torso,
+      separate head and torso.
+
+  # ----------------------------------------------------------------------------
+  # Extensible Guest & Recurring Characters (Set default_active: true or pass
+  # character IDs in topics.yaml `characters: [lily, robo, mia]` to include)
+  # ----------------------------------------------------------------------------
+  - id: "mia"
+    name: "Mia"
+    name_es: "Mía"
+    name_zh: "米娅"
+    role: "recurring_friend"
+    default_active: false
+    reference_image: "assets/characters/mia_ref.png"
+    visual_description: >-
+      Mia is Lily's curious 6-year-old best friend with warm tan skin, bright hazel eyes
+      behind round tortoiseshell glasses, and bouncy dark-brown curly hair styled in two
+      fluffy puffs with lavender star hair clips. She wears a pastel mint-green overall
+      jumper over a cream striped tee and lavender canvas sneakers.
+    strict_invariants: >-
+      Mia is ALWAYS a 6-year-old girl with warm tan skin, round tortoiseshell glasses,
+      two dark-brown curly hair puffs with lavender star clips, and a mint-green overall
+      jumper over a cream tee.
+    negative_traits: >-
+      missing glasses, straight hair, different outfit color.
+
+  - id: "leo"
+    name: "Leo"
+    name_es: "Leo"
+    name_zh: "里奥"
+    role: "recurring_friend"
+    default_active: false
+    reference_image: "assets/characters/leo_ref.png"
+    visual_description: >-
+      Leo is Lily's inventive 6-year-old neighbor with warm brown skin, big cheerful dark-brown
+      eyes, short curly black hair, and a cozy coral-orange hooded vest over a sky-blue shirt
+      with khaki shorts and white sneakers, carrying a small wooden magnifying glass.
+    strict_invariants: >-
+      Leo is ALWAYS a 6-year-old boy with warm brown skin, short curly black hair, coral-orange
+      hooded vest over a sky-blue shirt, and khaki shorts.
+    negative_traits: >-
+      long hair, adult proportions.
+
+  # ----------------------------------------------------------------------------
+  # Chinese Heritage & Proverbs Genre Core Cast (genre: "chinese_heritage")
+  # Mei (美美, 6yo sister), Ming (明明, 5yo brother) & Baobao (宝宝, red-panda spirit guide)
+  # ----------------------------------------------------------------------------
+  - id: "mei"
+    name: "Mei"
+    name_es: "Mei"
+    name_zh: "美美"
+    genre: "chinese_heritage"
+    role: "protagonist"
+    default_active: false
+    reference_image: "assets/characters/mei_ref.png"
+    visual_description: >-
+      Mei is a curious, kind-hearted 6-year-old Chinese girl with warm fair-peach skin, soft rosy
+      watercolor cheeks, expressive large dark-brown eyes with white catchlights, and glossy jet-black
+      hair with soft bangs across her forehead, styled in two traditional round double-buns (shuangyaji
+      twin buns) on the upper sides of her head tied with crimson-red silk ribbons and tiny golden bell
+      tassels. She wears a modern-traditional vermilion-red and peach-blossom-pink embroidered tangzhuang
+      tunic top with golden cloud-collar trim and three golden frog-button closures down the front over
+      a soft cream pleated skirt, white ankle socks, and embroidered red cloth Mary Jane strap shoes.
+      Mei has EXACTLY TWO normal arms and TWO hands total.
+    strict_invariants: >-
+      Mei is ALWAYS a 6-year-old Chinese girl with glossy jet-black hair in two round top-side double-buns
+      tied with crimson-red silk ribbons and tiny golden bell tassels plus soft bangs, large dark-brown
+      eyes, rosy cheeks, wearing a vermilion-red and peach-pink embroidered tangzhuang tunic top with
+      golden frog buttons over a soft cream pleated skirt, white ankle socks, and red embroidered Mary Jane
+      shoes (NEVER blonde or brown hair, NEVER loose untied hair, NEVER extra hands — Mei has EXACTLY TWO
+      arms and TWO hands total).
+    negative_traits: >-
+      blonde hair, brown hair, loose hair without twin buns, western polka-dot yellow dress, extra hands,
+      four hands, three hands.
+
+  - id: "ming"
+    name: "Ming"
+    name_es: "Ming"
+    name_zh: "明明"
+    genre: "chinese_heritage"
+    role: "protagonist"
+    default_active: false
+    reference_image: "assets/characters/ming_ref.png"
+    visual_description: >-
+      Ming is Mei's playful, energetic 5-year-old younger brother (slightly shorter than Mei) with warm
+      fair-peach skin, rosy watercolor cheeks, big cheerful round dark-brown eyes with white catchlights,
+      and short neat jet-black hair with a cute soft crown tuft. He wears a jade-green and sky-blue
+      sleeveless tangzhuang vest with golden cloud embroidery and golden frog-button closures over a
+      crisp cream short-sleeved cotton shirt, navy-blue rolled-cuff shorts, white ankle socks, and
+      teal-and-cream canvas slip-on shoes. Ming has EXACTLY TWO normal arms and TWO hands total.
+    strict_invariants: >-
+      Ming is ALWAYS a 5-year-old Chinese boy (slightly shorter than his sister Mei) with short neat
+      jet-black hair, round dark-brown eyes, rosy cheeks, wearing a jade-green and sky-blue embroidered
+      tangzhuang vest with golden frog buttons over a cream short-sleeved shirt, navy-blue shorts, white
+      socks, and teal-and-cream shoes (NEVER a girl, NEVER wearing red tunic, NEVER extra hands — Ming
+      has EXACTLY TWO arms and TWO hands total).
+    negative_traits: >-
+      long hair, buns, girl dress, extra limbs, extra hands.
+
+  - id: "baobao"
+    name: "Baobao"
+    name_es: "Baobao"
+    name_zh: "宝宝"
+    genre: "chinese_heritage"
+    role: "companion"
+    default_active: false
+    reference_image: "assets/characters/baobao_ref.png"
+    visual_description: >-
+      Baobao is a tiny, magical, chubby red-panda spirit guide (about knee-high to Mei and Ming) with
+      plush cinnamon-rust and warm amber-orange watercolor fur, soft cream facial markings around his
+      large sparkling dark-brown eyes and fluffy rounded cream-tipped ears, rosy cheek blush ovals, a
+      small cute dark-brown button nose, a gentle happy smile, and a big fluffy ringed tail with
+      alternating cinnamon-red and warm cream stripes. Around his neck he wears a small glowing
+      celadon-jade cloud pendant on a braided red silk cord that radiates a gentle golden-amber warmth.
+    strict_invariants: >-
+      Baobao is ALWAYS a small, chubby cinnamon-rust and amber-orange red panda (knee-high to Mei and
+      Ming) with cream facial markings, fluffy cream-tipped ears, a big fluffy striped ringed tail, and
+      a glowing green celadon-jade cloud pendant on a red cord around his neck (NEVER a black-and-white
+      giant panda, NEVER a metallic robot, NEVER human clothes covering his fur).
+    negative_traits: >-
+      black and white giant panda, metallic robot, blue robot, scary fangs, realistic wild predator.
+
