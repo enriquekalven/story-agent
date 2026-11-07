@@ -31,7 +31,7 @@ jobs:
       GCP_WIF_PROVIDER: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Install system dependencies (FFmpeg + Noto CJK fonts + epubcheck)
         run: |
